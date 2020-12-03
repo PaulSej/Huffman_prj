@@ -395,7 +395,7 @@ void encoded(const char *file_test, char *binary_file, char *dico){
 
 }
 
-insert_binary_in_file(FILE *compressed){
+void insert_binary_in_file(FILE *compressed){
         FILE* dictionnary = fopen("dico.txt","r");
         while(fgets(second,30,dictionnary)[0] != first);
                 i = 4;
