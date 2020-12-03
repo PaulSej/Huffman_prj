@@ -395,3 +395,38 @@ void encoded(const char *file_test, char *binary_file, char *dico){
 
 }
 
+insert_binary_in_file(FILE *compressed){
+        FILE* dictionnary = fopen("dico.txt","r");
+        while(fgets(second,30,dictionnary)[0] != first);
+                i = 4;
+                while(second[i] != '\n')
+                {
+                    if(second[i] !=  '\n')
+                        fputc(second[i],compressed);
+                    i += 1;
+                }
+        fclose(dictionnary);
+    }
+}
+
+
+void encoded(const char *file_test, char *binary_file, char *dico){
+    FILE *input = fopen("file_test.txt","r");
+    FILE* output = fopen("binary_file.txt","a");//changer ici w par a
+    char second[30];
+    if(input==NULL){
+        puts("Error! Can't open the original file");
+        exit(1);}
+   if(output == NULL){
+        puts("Error! Can't open the original file");
+        exit(1);}
+    char * first;
+    char comb[30];
+    int i;
+    while ((first = getc(input)) != EOF) {
+        insert_binary_in_file(binary_file);
+    fclose(input);
+    fclose(output);
+}
+
+
