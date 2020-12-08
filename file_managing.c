@@ -332,67 +332,44 @@ int main(){
     char file_txt_name[] = "file_test.txt";
     List * list = txt_to_list("file_test.txt");
     trie(list);
-    /*
-    Tree * t = list_to_huffman(&list);
-    read_Tree(t);
-
-    print_char_nbr(file_txt_name);
-    translate_txt_to_bin(file_txt_name);
-    print_char_nbr("binary_file.txt");
-
-    char file_txt_name[] = "file_test.txt";
-    print_char_nbr(file_txt_name);
-    char *file_bin_name = translate_txt_to_bin(file_txt_name);
-    print_char_nbr(file_bin_name);
-    translate_bin_to_txt(file_bin_name);
-
-
-    printf("with extension: %s\n",word);
-
-    printf("without extention: %s\n", rm_extension(word));
-
-    FILE *file_pt = fopen("file_test.txt", "r");
-    char c[30];
-    int i = 4;
-    while(fgets(c,30,file_pt) != NULL){
-        for (i=4; c[i] != '\n'; i++){
-            printf("%c",c[i]);}}
-    fclose(file_pt);
-    */
-    encoded("file_test.txt","binary_file.txt","dico.txt");
+    text_to_binary("file_test.txt","dico.txt");
 }
 
 
-void encoded(const char *file_test, char *binary_file, char *dico){
-    FILE* input = fopen("file_test.txt","r");
-    FILE* output = fopen("binary_file.txt","w");
-    char second[30];
-    if(input==NULL){
+void text_to_binary(const char *file_test, char *dico){
+    FILE* texte = fopen("file_test.txt","r");
+    FILE* dictionnary = fopen("dico.txt","r");
+    if(texte==NULL){
         puts("Error! Can't open the original file");
         exit(1);}
- /*   if(dictionnary == NULL){
+    if(dictionnary == NULL){
         puts("Error! Can't open the original file");
-        exit(1);}*/
-    char * first;
-    char comb[30];
+        exit(1);}
+    char * char_text;
     int i;
+    char * char_dico1;
+    char * char_dico2;
 
-    while ((first = getc(input)) != EOF) {
-        FILE* dictionnary = fopen("dico.txt","r");
-        while(fgets(second,30,dictionnary)[0] != first);
-                i = 4;
-                printf("%c == %c :",first,second[0]);
+    while ((char_text = getc(texte)) != EOF) {
 
-                while(second[i] != '\n')
-                {       if(second[i] !=  '\n' )
-                        printf("%c",second[i]);
-                    i += 1;
-                }
-                printf("\n");
-        fclose(dictionnary);
+        char_dico1 = NULL;
+        char_dico2 = NULL;
+        while(char_dico1 != ' ' || char_dico2 !=  char_text )
+        {
+            char_dico2 = char_dico1;
+            (char_dico1 = getc(dictionnary));
+        }
+        printf("%c",char_dico2);
+        while((char_dico1 = getc(dictionnary)) !=  '\n' && char_dico1 != EOF )
+        {
+            printf("%c",char_dico1);
+        }
+        printf("\n");
+
+         rewind(dictionnary);
     }
-    fclose(input);
-    fclose(output);
+    fclose(texte);
+    fclose(dictionnary);
 
 }
 
