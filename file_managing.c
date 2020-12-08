@@ -189,11 +189,8 @@ void * trie(List * l)
 {
     if(l == 0){return;}
     int a = 1;
-    char letter;
-    int occ = 0;
-    Tree * right;
-    Tree * left;
     List * buffer = l;
+    Tree * temp;
     while(a == 1)
     {
         a = 0;
@@ -202,19 +199,9 @@ void * trie(List * l)
         {
             if(buffer->data->occ > buffer->next->data->occ)
             {
-
-                letter = buffer->next->data->letter;
-                occ = buffer->next->data->occ;
-                right = buffer->next->data->right;
-                left = buffer->next->data->left;
-                buffer->next->data->occ = buffer->data->occ;
-                buffer->data->occ = occ;
-                buffer->next->data->letter = buffer->data->letter;
-                buffer->next->data->right = buffer->data->right;
-                buffer->next->data->left = buffer->data->left;
-                buffer->data->letter = letter;
-                buffer->data->right = right;
-                buffer->data->left = left;
+                temp = buffer->next->data;
+                buffer->next->data = buffer->data;
+                buffer->data = temp;
                 a = 1;
             }
             else
@@ -332,7 +319,7 @@ int main(){
     char file_txt_name[] = "file_test.txt";
     List * list = txt_to_list("file_test.txt");
     trie(list);
-    text_to_binary("file_test.txt","dico.txt");
+    read_list(list);
 }
 
 
