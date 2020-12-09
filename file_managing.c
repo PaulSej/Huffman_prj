@@ -197,7 +197,7 @@ void * trie(List * l)
         buffer = l;
         while(buffer->next != 0)
         {
-            if(buffer->data->occ > buffer->next->data->occ)
+            if(buffer->data->occ > buffer->next->data->occ ||( buffer->data->occ == buffer->next->data->occ && buffer->data->letter == NULL && buffer->next->data->letter != NULL) )
             {
                 temp = buffer->next->data;
                 buffer->next->data = buffer->data;
@@ -214,7 +214,7 @@ void * trie(List * l)
 
 
 
-Tree * pop(List ** l)
+Tree * dequeue(List ** l)
 {
     if(*l == NULL)
         return NULL;
@@ -226,13 +226,25 @@ Tree * pop(List ** l)
 
 
 }
-void add_node_to_list(List ** l,Tree * node)
+void enqueue(List ** l,Tree * node)
 {
-    List * temp = (List *)malloc(sizeof(List));
-    temp->next = *l;
-    temp->data = node;
-    *l = temp;
-
+    List * temp = *l;
+    List * new_node = (List *)malloc(sizeof(List));
+    new_node->data = node;
+    new_node->next = NULL;
+    if(temp != NULL)
+    {
+        while(temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = new_node;
+        temp = new_node;
+    }
+    else
+    {
+        *l = new_node;
+    }
 }
 int size_list(List * l)
 {
@@ -255,7 +267,11 @@ void read_Tree(Tree * t)
         else
             printf("letter: %c ",t->letter);
         printf("occ: %d\n",t->occ);
+        if(t->left != NULL)
+            printf("%d left ",t->occ);
         read_Tree(t->left);
+        if(t->right != NULL)
+            printf("%d right ",t->occ);
         read_Tree(t->right);
 
     }
@@ -273,6 +289,7 @@ void read_list(List * l)
         printf("occ %d\n",temp->data->occ);
         temp = temp->next;
     }
+    printf("\n\n\n");
 }
 void read_node(Tree * node)
 {
@@ -288,38 +305,45 @@ void read_node(Tree * node)
 
 Tree * list_to_huffman(List ** l)
 {
-    List * temp;
-    while(size_list(*l) > 1)
+    List * new_node;
+    List * queue = NULL;
+    trie(*l);
+    do
     {
-        Tree * node1;
-        node1 = pop(l);
-        Tree * node2;
-        node2 = pop(l);
-        if(node1->letter != NULL)
-            node1->left =  node1->right = NULL;
-        if(node2->letter != NULL)
-            node2->left =  node2->right = NULL;
+        Tree * node_left;
+        Tree * node_right;
+        if(queue == NULL || (*l != NULL && (*l)->data->occ <= queue->data->occ))
+        {
+            node_right = dequeue(l);
+        }
+        else
+        {
+            node_right = dequeue(&queue);
+        }
+        if(queue == NULL || (*l != NULL && (*l)->data->occ <= queue->data->occ))
+        {
+            node_left = dequeue(l);
+        }
+        else
+        {
+            node_left = dequeue(&queue);
+        }
 
-        temp = (List *)malloc(sizeof(List));
-        temp->data = (Tree *)malloc(sizeof(Tree));
-        temp->data->letter = NULL;
-        temp->data->occ = node1->occ + node2->occ;
-        temp->data->right = node1;
-        temp->data->left =  node2;
+        if(node_right->letter != NULL)
+            node_right->left =  node_right->right = NULL;
+        if(node_left->letter != NULL)
+            node_left->left =  node_left->right = NULL;
 
-        add_node_to_list(l,temp->data);
-        trie(*l);
-    }
-    return temp->data;
-}
+        new_node = (List *)malloc(sizeof(List));
+        new_node->data = (Tree *)malloc(sizeof(Tree));
+        new_node->data->letter = NULL;
+        new_node->data->occ = node_right->occ + node_left->occ;
+        new_node->data->right = node_right;
+        new_node->data->left =  node_left;
+        enqueue(&queue,new_node->data);
 
-
-int main(){
-
-    char file_txt_name[] = "file_test.txt";
-    List * list = txt_to_list("file_test.txt");
-    trie(list);
-    read_list(list);
+    }while(size_list(*l) > 1 || size_list(queue) > 1);
+    return new_node->data;
 }
 
 
@@ -336,17 +360,20 @@ void text_to_binary(const char *file_test, char *dico){
     int i;
     char * char_dico1;
     char * char_dico2;
+    char * char_dico3;
 
     while ((char_text = getc(texte)) != EOF) {
 
         char_dico1 = NULL;
         char_dico2 = NULL;
-        while(char_dico1 != ' ' || char_dico2 !=  char_text )
+        char_dico3 = NULL;
+        while(char_dico1 != ':' || char_dico2 !=  ' ' || char_dico3 != char_text )
         {
+            char_dico3 = char_dico2;
             char_dico2 = char_dico1;
             (char_dico1 = getc(dictionnary));
         }
-        printf("%c",char_dico2);
+        printf("%c :",char_dico3);
         while((char_dico1 = getc(dictionnary)) !=  '\n' && char_dico1 != EOF )
         {
             printf("%c",char_dico1);
@@ -360,3 +387,11 @@ void text_to_binary(const char *file_test, char *dico){
 
 }
 
+
+int main(){
+
+    char file_txt_name[] = "file_test.txt";
+    List * list = txt_to_list("file_test.txt");
+    Tree * t = list_to_huffman(&list);
+    read_Tree(t);
+}
