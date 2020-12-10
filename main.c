@@ -1,7 +1,6 @@
-#include "file_managing.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "file_managing.h"
 
 int main(int argc,char *argv[]){
     FILE *dico = fopen("dico.txt", "w");

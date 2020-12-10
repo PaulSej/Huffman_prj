@@ -5,9 +5,6 @@
 
 
 
-
-
-
 int size_list(List * l)
 {
     List * temp = l;
@@ -368,49 +365,30 @@ Node * list_to_huffman(List ** l)
 }
 
 
+void create_dico(FILE *dico, Node *huffman_tree, int bit_sequence[], int depth)
+{
 
-void text_to_binary(char *file_test, char *dico, char * compressed){
-    FILE* texte = fopen(file_test,"r");
-    FILE* dictionnary = fopen(dico,"r");
-    FILE* compressed_text = fopen(compressed,"w");
-    if(texte==NULL){
-        puts("Error! Can't open the original file");
-        exit(1);}
-    if(dictionnary == NULL){
-        puts("Error! Can't open the original file");
-        exit(1);}
-    char * char_text;
-    int i;
-    char * char_dico1;
-    char * char_dico2;
-    char * char_dico3;
+    if (huffman_tree->left) {
 
-    while ((char_text = getc(texte)) != EOF) {
-
-        char_dico1 = NULL;
-        char_dico2 = NULL;
-        char_dico3 = NULL;
-
-        while(char_dico1 != ' ' || char_dico2 !=  ':' || char_dico3 != char_text )
-        {
-            char_dico3 = char_dico2;
-            char_dico2 = char_dico1;
-            (char_dico1 = getc(dictionnary));
-        }
-        while((char_dico1 = getc(dictionnary)) !=  '\n' && char_dico1 != EOF )
-        {
-            fprintf(compressed_text,"%c", char_dico1);
-        }
-
-         rewind(dictionnary);
+        bit_sequence[depth] = 0;
+        create_dico(dico, huffman_tree->left, bit_sequence, depth + 1);
     }
-    fclose(texte);
-    fclose(dictionnary);
-    fclose(compressed_text);
+    if (huffman_tree->right) {
 
+        bit_sequence[depth] = 1;
+        create_dico(dico, huffman_tree->right, bit_sequence, depth + 1);
+    }
+    if (huffman_tree->letter != NULL) {
+
+        fprintf(dico,"%c: ", huffman_tree->letter);
+        int i;
+        for(i = 0 ; i < depth ; i ++)
+            fprintf(dico,"%d", bit_sequence[i]);
+        fputc('\n',dico);
+    }
 }
 
-void text_to_binary2(char *file_test, char *dico, char * compressed){
+void text_to_binary(char *file_test, char *dico, char * compressed){
     FILE* texte = fopen(file_test,"r");
     FILE* dictionnary = fopen(dico,"r");
     FILE* compressed_text = fopen(compressed,"w");
@@ -445,26 +423,4 @@ void text_to_binary2(char *file_test, char *dico, char * compressed){
 
 }
 
-void create_dico(FILE *dico, Node *huffman_tree, int bit_sequence[], int depth)
-{
-
-    if (huffman_tree->left) {
-
-        bit_sequence[depth] = 0;
-        create_dico(dico, huffman_tree->left, bit_sequence, depth + 1);
-    }
-    if (huffman_tree->right) {
-
-        bit_sequence[depth] = 1;
-        create_dico(dico, huffman_tree->right, bit_sequence, depth + 1);
-    }
-    if (huffman_tree->letter != NULL) {
-
-        fprintf(dico,"%c: ", huffman_tree->letter);
-        int i;
-        for(i = 0 ; i < depth ; i ++)
-            fprintf(dico,"%d", bit_sequence[i]);
-        fputc('\n',dico);
-    }
-}
 
