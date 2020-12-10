@@ -9,15 +9,15 @@
 #define FILE_MANAGING
 
 /**
- *\typedef struct Tree
+ *\typedef struct Node
  * \brief aa tree is composed of a data, pointers to the structure itself.
  */
-typedef struct Tree {
+typedef struct Node {
     char letter;
     int occ;
-    struct Tree* right;
-    struct Tree* left;
-}Tree;
+    struct Node* right;
+    struct Node* left;
+}Node;
 
 /**
  *\typedef struct List
@@ -30,11 +30,41 @@ typedef struct List {
 
 
 
+/**
+  * \brief Function to count the size of the list.
+  * \param l a pointer to the List to modifiy.
+  * \return the size of the list.
+  */
+char *rm_extension(char fname[]);
+
+
+int size_list(List* l);
+
+/**
+ * \brief Function to display a list.
+ * \param l a pointer to the list to modifiy.
+ */
+void read_list(List * l);
+void read_node(Node * node);
+
+ /**
+  * \brief Function to display a tree.
+  * \param t a pointer to the Tree to modifiy.
+  */
+
+void read_Tree(Node * t);
+
  /**
   * \brief Function to count the number of characters in a file.
   * \param file_name a pointer to the const char to modifiy.
   */
 void print_char_nbr(const char* file_name);
+
+Node * dequeue(List ** l);
+void enqueue(List ** l,Node * node);
+void sort_by_letter(List * l);
+void sort_by_occ(List * l);
+int find_dicoto(List ** list,int begin,int end,char c);
 
  /**
   * \brief Function to translate an alphabetic text into a binary txt.
@@ -47,34 +77,16 @@ void translate_txt_to_bin(char* original_file_name);
   * \param original_file_name a pointer to the char to modifiy.
   * * \return the List's pointer.
   */
-List* txt_to_list(char* original_file_name);
+List * txt_to_list_standard(char *original_file_name);
 
-/**
-  * \brief Function to count the size of the list.
-  * \param l a pointer to the List to modifiy.
-  * \return the size of the list.
-  */
-int size_list(List* l);
+List * txt_to_list_dico(char * file_name);
 
  /**
   * \brief Function to translate the linked list into Huffman tree.
   * \param l a pointer to the List to modifiy.
   * \return the Huffman tree.
   */
-Tree* list_to_huffman(List* l);
-
- /**
-  * \brief Function to display a tree.
-  * \param t a pointer to the Tree to modifiy.
-  */
-void read_Tree(Tree* t);
-
-/**
- * \brief Function to display a list.
- * \param l a pointer to the list to modifiy.
- */
-void read_list(List* l);
-
-
+Node * list_to_huffman(List ** l);
+void text_to_binary(const char *file_test, char *dico);
 #endif // !FILE_MANAGING
 

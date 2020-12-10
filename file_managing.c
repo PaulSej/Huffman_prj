@@ -17,29 +17,6 @@ typedef struct List{
 
 
 
-
-
-
-char *rm_extension(char fname[]){
-
-    if(fname != NULL){
-        int i = 0;
-        while(fname[i] != '\0'){
-            if(fname[i] == '.'){
-                fname[i] = '\0';
-            }
-
-            i++;
-        }
-
-    }
-
-    return fname;
-
-}
-
-
-
 int size_list(List * l)
 {
     List * temp = l;
@@ -115,6 +92,7 @@ void print_char_nbr(const char* file_name){
     int cpt = 0;
     while(fgetc(file_pt) != EOF) cpt++;
     printf("Le fichier '%s' contient %d characters\n",file_name,cpt);
+    fclose(file_pt);
 }
 
 
@@ -157,7 +135,7 @@ void enqueue(List ** l,Node * node)
 
 
 
-void trie_letter(List * l)
+void sort_by_letter(List * l)
 {
     if(l == 0){return;}
     int a = 1;
@@ -186,7 +164,7 @@ void trie_letter(List * l)
 
 
 
-void * trie_occ(List * l)
+void sort_by_occ(List * l)
 {
     if(l == 0){return;}
     int a = 1;
@@ -341,7 +319,7 @@ List * txt_to_list_dico(char * file_name)
             list[size]->data->letter = c;
             list[size]->data->occ = 1;
             size += 1;
-            trie_letter(*list);
+            sort_by_letter(*list);
         }
         else
         {
@@ -359,7 +337,7 @@ Node * list_to_huffman(List ** l)
 {
     List * new_node;
     List * queue = NULL;
-    trie_occ(*l);
+    sort_by_occ(*l);
     do
     {
         Node * node_left;
@@ -400,9 +378,10 @@ Node * list_to_huffman(List ** l)
 
 
 
-void text_to_binary(const char *file_test, char *dico){
-    FILE* texte = fopen("file_test.txt","r");
-    FILE* dictionnary = fopen("dico.txt","r");
+void text_to_binary(char *file_test, char *dico, char * compressed){
+    FILE* texte = fopen(file_test,"r");
+    FILE* dictionnary = fopen(dico,"r");
+    FILE* compressed_text = fopen(compressed,"w");
     if(texte==NULL){
         puts("Error! Can't open the original file");
         exit(1);}
@@ -420,59 +399,93 @@ void text_to_binary(const char *file_test, char *dico){
         char_dico1 = NULL;
         char_dico2 = NULL;
         char_dico3 = NULL;
-        while(char_dico1 != ':' || char_dico2 !=  ' ' || char_dico3 != char_text )
+
+        while(char_dico1 != ' ' || char_dico2 !=  ':' || char_dico3 != char_text )
         {
             char_dico3 = char_dico2;
             char_dico2 = char_dico1;
             (char_dico1 = getc(dictionnary));
         }
-        printf("%c :",char_dico3);
         while((char_dico1 = getc(dictionnary)) !=  '\n' && char_dico1 != EOF )
         {
-            printf("%c",char_dico1);
+            fprintf(compressed_text,"%c", char_dico1);
         }
-        printf("\n");
 
          rewind(dictionnary);
     }
     fclose(texte);
     fclose(dictionnary);
+    fclose(compressed_text);
 
 }
 
+void text_to_binary2(char *file_test, char *dico, char * compressed){
+    FILE* texte = fopen(file_test,"r");
+    FILE* dictionnary = fopen(dico,"r");
+    FILE* compressed_text = fopen(compressed,"w");
+    if(texte==NULL){
+        puts("Error! Can't open the original file");
+        exit(1);}
+    if(dictionnary == NULL){
+        puts("Error! Can't open the original file");
+        exit(1);}
+    char * char_text;
+    int i;
+    char line[256];
+    while ((char_text = getc(texte)) != EOF ) {
 
+        while( fgets(line, sizeof(line), dictionnary) && line[0] != char_text);
+        i = 3;
+        if(char_text == '\n')
+        {
+            fgets(line, sizeof(line), dictionnary);
+            i = 2;
+        }
+        while(line[i] != '\n' )
+        {
+            fprintf(compressed_text,"%c", line[i]);
+            i += 1;
+        }
+         rewind(dictionnary);
+    }
+    fclose(texte);
+    fclose(dictionnary);
+    fclose(compressed_text);
 
-void printCodes(Node * root, int arr[], int top)
+}
+
+void create_dico(FILE *dico, Node *huffman_tree, int bit_sequence[], int depth)
 {
 
-    if (root->left) {
+    if (huffman_tree->left) {
 
-        arr[top] = 0;
-        printCodes(root->left, arr, top + 1);
+        bit_sequence[depth] = 0;
+        create_dico(dico, huffman_tree->left, bit_sequence, depth + 1);
     }
-    if (root->right) {
+    if (huffman_tree->right) {
 
-        arr[top] = 1;
-        printCodes(root->right, arr, top + 1);
+        bit_sequence[depth] = 1;
+        create_dico(dico, huffman_tree->right, bit_sequence, depth + 1);
     }
-    if (root->letter != NULL) {
+    if (huffman_tree->letter != NULL) {
 
-        printf("%c: ", root->letter);
+        fprintf(dico,"%c: ", huffman_tree->letter);
         int i;
-        for (i = 0; i < top; ++i)
-            printf("%d", arr[i]);
-
-        printf("\n");
+        for(i = 0 ; i < depth ; i ++)
+            fprintf(dico,"%d", bit_sequence[i]);
+        fputc('\n',dico);
     }
 }
 
 
 
 int main(){
-
+    FILE *dico = fopen("dico.txt", "w");
     List * list = txt_to_list_dico("file_test.txt");
+    int arr[size_list(list)];
     Node * huffman = list_to_huffman(&list);
-    read_Tree(huffman);
-    int arr[156];
-    printCodes(huffman,arr,0);
+    create_dico(dico,huffman,arr,0);
+    fclose(dico);
+    text_to_binary2("file_test.txt","dico.txt","compressed.txt");
+
 }
