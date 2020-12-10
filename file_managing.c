@@ -463,7 +463,49 @@ void text_to_binary(const char *file_test, char *dico){
 
 }
 
+void push_stack(List * l,Tree * node)
+{
+    List * buffer = malloc(sizeof(List));
+    buffer->data = malloc(sizeof(Tree));
+    buffer->data = node;
+    buffer->next = l;
+    l = buffer;
 
+}
+
+Tree * pop_stack(List ** l)
+{
+    if(*l == NULL)
+        return NULL;
+    List * temp = (*l);
+    Tree * new_el = temp->data;
+    (*l) = temp->next;
+    free(temp);
+    return new_el;
+}
+void printCodes(Tree * root, int arr[], int top)
+{
+
+    if (root->left) {
+
+        arr[top] = 0;
+        printCodes(root->left, arr, top + 1);
+    }
+    if (root->right) {
+
+        arr[top] = 1;
+        printCodes(root->right, arr, top + 1);
+    }
+    if (root->letter != NULL) {
+
+        printf("%c: ", root->letter);
+        int i;
+        for (i = 0; i < top; ++i)
+            printf("%d", arr[i]);
+
+        printf("\n");
+    }
+}
 int main(){
 
     /*char file_txt_name[] = "file_test.txt";
@@ -472,5 +514,8 @@ int main(){
     Tree * t = list_to_huffman(&list);
     read_Tree(t);*/
     List * list = txt_to_list_dico("file_test.txt");
-    read_list(list);
+    Tree * huffman = list_to_huffman(&list);
+    read_Tree(huffman);
+    int arr[156];
+    printCodes(huffman,arr,0);
 }
