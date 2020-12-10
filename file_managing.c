@@ -1,19 +1,10 @@
+#include "file_managing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
-typedef struct Node{
-    char letter;
-    int occ;
-    struct Node * right;
-    struct Node * left;
-}Node;
 
-typedef struct List{
-    Node * data;
-    struct List * next;
-}List;
 
 
 
@@ -477,15 +468,3 @@ void create_dico(FILE *dico, Node *huffman_tree, int bit_sequence[], int depth)
     }
 }
 
-
-
-int main(){
-    FILE *dico = fopen("dico.txt", "w");
-    List * list = txt_to_list_dico("file_test.txt");
-    int arr[size_list(list)];
-    Node * huffman = list_to_huffman(&list);
-    create_dico(dico,huffman,arr,0);
-    fclose(dico);
-    text_to_binary2("file_test.txt","dico.txt","compressed.txt");
-
-}

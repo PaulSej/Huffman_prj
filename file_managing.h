@@ -5,8 +5,9 @@
  * \author Léa Lauthrey DIET lea.lauthrey@gmail.com.
  * \date   December 2020
  *********************************************************************/
-#ifndef FILE_MANAGING
-#define FILE_MANAGING
+#ifndef FILE_MANAGING_H
+#define FILE_MANAGING_H
+
 
 /**
  *\typedef struct Node
@@ -24,7 +25,7 @@ typedef struct Node {
  * \brief aa tree is composed of pointer to the structure itself and to the Tree.
  */
 typedef struct List {
-    Tree* data;
+    Node* data;
     struct List* next;
 }List;
 
@@ -87,6 +88,6 @@ List * txt_to_list_dico(char * file_name);
   * \return the Huffman tree.
   */
 Node * list_to_huffman(List ** l);
-void text_to_binary(const char *file_test, char *dico);
-#endif // !FILE_MANAGING
+void text_to_binary(char *file_test, char *dico, char * compressed);
+#endif
 
