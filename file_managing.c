@@ -139,7 +139,7 @@ void translate_txt_to_bin(char *original_file_name){
     fclose(bin_file_pt);
     fclose(original_file_pt);
 }
-List * txt_to_list(char *original_file_name)
+List * txt_to_list_standard(char *original_file_name)
 {
     FILE *original_file_pt = fopen(original_file_name,"r");
     if(original_file_name == NULL){
@@ -148,6 +148,9 @@ List * txt_to_list(char *original_file_name)
     }
     char c;
     List * list;
+    List * new_list[256];
+    int size = 0;
+
     list = malloc(sizeof(List));
     list->data = malloc(sizeof(Tree));
     List * temp;
@@ -184,8 +187,81 @@ List * txt_to_list(char *original_file_name)
         }
     return list;
 }
+void trie_letter(List * l)
+{
+    if(l == 0){return;}
+    int a = 1;
+    List * buffer = l;
+    Tree * temp;
+    while(a == 1)
+    {
+        a = 0;
+        buffer = l;
+        while(buffer->next != 0)
+        {
+            if(buffer->data->letter > buffer->next->data->letter)
+            {
+                temp = buffer->next->data;
+                buffer->next->data = buffer->data;
+                buffer->data = temp;
+                a = 1;
+            }
+            else
+            {
+                buffer = buffer->next;
+            }
+        }
+    }
+}
+int find_dico(List ** list,int begin,int end,char c)
+{
+    int mid = begin+(end-begin)/2;
+    if(list[mid] !=  NULL && end >= begin)
+    {
+        if(list[mid]->data->letter == c)
+            return mid;
+        if(list[mid]->data->letter > c)
+            return find_dico(list,begin,mid-1,c);
+        return find_dico(list,mid+1,end,c);
+    }
+    return -1;
+}
+List * txt_to_list_dico(char * file_name)
+{
+    FILE * texte = fopen(file_name,"r");
+    if(file_name == NULL){
+        puts("Error! Can't open the original file");
+        exit(1);
+    }
+    char c;
+    int i;
+    List * list[256] = { NULL };
+    int size = 0;
+    while((c = fgetc(texte)) != EOF)
+    {
+        i = find_dico(list,0,size,c);
+        if(i == -1)
+        {
+            list[size] = (List *)malloc(sizeof(List));
+            list[size]->data = (Tree *)malloc(sizeof(Tree));
+            if(size > 0)
+                list[size-1]->next = list[size];
+            list[size]->next = NULL;
+            list[size]->data->letter = c;
+            list[size]->data->occ = 1;
+            size += 1;
+            trie_letter(*list);
+        }
+        else
+        {
+            list[i]->data->occ +=1;
+        }
+    }
 
-void * trie(List * l)
+
+    return list[0];
+}
+void * trie_occ(List * l)
 {
     if(l == 0){return;}
     int a = 1;
@@ -307,7 +383,7 @@ Tree * list_to_huffman(List ** l)
 {
     List * new_node;
     List * queue = NULL;
-    trie(*l);
+    trie_occ(*l);
     do
     {
         Tree * node_left;
@@ -390,8 +466,11 @@ void text_to_binary(const char *file_test, char *dico){
 
 int main(){
 
-    char file_txt_name[] = "file_test.txt";
+    /*char file_txt_name[] = "file_test.txt";
     List * list = txt_to_list("file_test.txt");
+    read_list(list);
     Tree * t = list_to_huffman(&list);
-    read_Tree(t);
+    read_Tree(t);*/
+    List * list = txt_to_list_dico("file_test.txt");
+    read_list(list);
 }
