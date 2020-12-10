@@ -1,15 +1,15 @@
 /*****************************************************************//**
  * \file   file_managing.h
- * \brief  Header of the library allowing the management of file_managing. 
- * 
- * \author Léa Lauthrey DIET lea.lauthrey@gmail.com. 
+ * \brief  Header of the library allowing the management of file_managing.
+ *
+ * \author Léa Lauthrey DIET lea.lauthrey@gmail.com.
  * \date   December 2020
  *********************************************************************/
 #ifndef FILE_MANAGING
-#define FILE_MANAGING 
+#define FILE_MANAGING
 
 /**
- *\typedef struct Tree 
+ *\typedef struct Tree
  * \brief aa tree is composed of a data, pointers to the structure itself.
  */
 typedef struct Tree {
@@ -28,14 +28,10 @@ typedef struct List {
     struct List* next;
 }List;
 
-/**
-  * \brief Function to read a text.
-  * \param fname is an array of character.
-  */
-char* rm_extension(char fname[]);
+
 
  /**
-  * \brief Function to count the number of characters in a file. 
+  * \brief Function to count the number of characters in a file.
   * \param file_name a pointer to the const char to modifiy.
   */
 void print_char_nbr(const char* file_name);
@@ -52,25 +48,6 @@ void translate_txt_to_bin(char* original_file_name);
   * * \return the List's pointer.
   */
 List* txt_to_list(char* original_file_name);
-
- /**
-  * \brief Function to return the smallest element in a list.
-  * \param l a pointer to the List to modifiy.
-  * \return the List's pointer.
-  */
-Tree* return_smallest(List* l);
-
- /**
-  * \brief Function to delete an element in the list.
-  * \param l a pointer to the List to modifiy and element pointer to Tree to modify.
-  */
-void suppr_element(List* l, Tree* element);
-
- /**
-  * \brief Function to add an element in the list.
-  * \param l a pointer to the List to modifiy and element pointer to Tree to modify.
-  */
-void add_node_to_list(List* l, Tree* node);
 
 /**
   * \brief Function to count the size of the list.
